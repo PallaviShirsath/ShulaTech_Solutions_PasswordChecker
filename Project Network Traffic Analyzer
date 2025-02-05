@@ -1,0 +1,61 @@
+Step 1: Capturing Network Traffic:
+
+Step 2: Analyzing Packets with Scapy using python :
+python code :
+
+from scapy.all import rdpcap
+packets = rdpcap('traffic_capture.pcapng')
+print("Number of packets:", len(packets))
+packets.summary()
+packet = packets[0]
+packet.show()
+
+Step 3: Identifying Common Protocols using python code :
+from scapy.all import rdpcap, IP, TCP, UDP, ICMP
+
+packets = rdpcap('traffic_capture.pcap')
+
+src_ips = {}
+dst_ips = {}
+protocols = {}
+
+for pkt in packets:
+    if IP in pkt:
+        src_ip = pkt[IP].src
+        dst_ip = pkt[IP].dst
+
+        if src_ip in src_ips:
+            src_ips[src_ip] += 1
+        else:
+            src_ips[src_ip] = 1
+
+        if dst_ip in dst_ips:
+            dst_ips[dst_ip] += 1
+        else:
+            dst_ips[dst_ip] = 1
+
+        if TCP in pkt:
+            protocol = "TCP"
+        elif UDP in pkt:
+            protocol = "UDP"
+        elif ICMP in pkt:
+            protocol = "ICMP"
+        else:
+            protocol = "Other"
+
+        if protocol in protocols:
+            protocols[protocol] += 1
+        else:
+            protocols[protocol] = 1
+
+print("Top Sources:")
+for src_ip, count in sorted(src_ips.items(), key=lambda x: x[1], reverse=True)[:5]:
+    print(f"{src_ip}: {count}")
+
+print("\nTop Destinations:")
+for dst_ip, count in sorted(dst_ips.items(), key=lambda x: x[1], reverse=True)[:5]:
+    print(f"{dst_ip}: {count}")
+
+print("\nTop Protocols:")
+for protocol, count in sorted(protocols.items(), key=lambda x: x[1], reverse=True)[:5]:
+    print(f"{protocol}: {count}")
